@@ -20,7 +20,6 @@
             --soft: #334155;
         }
 
-        /* Estructura Base: Ocupa toda la pantalla */
         body, html {
             margin: 0;
             padding: 0;
@@ -51,11 +50,9 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            cursor: pointer;
             flex-shrink: 0;
         }
 
-        /* Contenedor Adaptativo */
         .container {
             padding: 15px;
             display: flex;
@@ -66,17 +63,15 @@
             box-sizing: border-box;
         }
 
-        /* Tarjetas que se ajustan según el ancho */
         .card {
             background: var(--card);
             padding: 15px;
             border-radius: 16px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
             box-sizing: border-box;
-            flex: 1 1 100%; /* Por defecto ancho total */
+            flex: 1 1 100%;
         }
 
-        /* En pantallas anchas (Horizontal/Tablet/PC) se ponen de a dos */
         @media (min-width: 768px) {
             .card.config-card { flex: 1 1 30%; }
             .card.entrega-card { flex: 1 1 60%; }
@@ -127,7 +122,7 @@
 <body onclick="activarFS()">
 
 <div id="app-content">
-    <header><span>🍽️ TAMARINDO PRO</span></header>
+    <header id="app-header"><span>🍽️ TAMARINDO PRO</span></header>
 
     <div class="container">
         <div class="card config-card">
@@ -150,7 +145,7 @@
                 <input type="text" id="dom-obs-general" class="input-domi" placeholder="Obs. Entrega">
             </div>
             <div id="section-mesas">
-                <label class="cat-label">Mesa</label>
+                <label class="cat-label">Mesa (Seleccionada mediante QR)</label>
                 <div class="grid" id="mesas"></div>
             </div>
         </div>
@@ -188,6 +183,7 @@ const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vS29H3hxA9X8VcqQqGZlT
 
 let data=[], headers=[], colEspecial=-1, total=1;
 let isDomicilio = false;
+let mesaFijaPorQR = null;
 
 function activarFS() {
     let doc = document.documentElement;
@@ -200,6 +196,7 @@ function activarFS() {
 window.onload = loadData;
 
 function toggleDomicilio(){
+    if(mesaFijaPorQR) return; // Si es mesa por QR, no permitir cambiar a domicilio
     isDomicilio = !isDomicilio;
     document.getElementById("btn-domicilio").classList.toggle("active", isDomicilio);
     document.getElementById("section-domicilio").style.display = isDomicilio ? "block" : "none";
@@ -239,8 +236,31 @@ function init(){
     generarDias();
     autoDia();
     crearMesas();
+    
+    // DETECTAR MESA DESDE URL (QR)
+    const urlParams = new URLSearchParams(window.location.search);
+    const mesaParam = urlParams.get('mesa');
+    if(mesaParam) {
+        mesaFijaPorQR = mesaParam;
+        aplicarMesaQR(mesaParam);
+    }
+
     render();
     cargarHistorial();
+}
+
+function aplicarMesaQR(num) {
+    setTimeout(() => {
+        document.querySelectorAll("#mesas .btn").forEach(b => {
+            if(b.textContent === num) {
+                b.classList.add("active");
+                // Bloquear interacción para que el cliente no cambie la mesa
+                document.getElementById("section-mesas").style.pointerEvents = "none";
+                document.getElementById("btn-domicilio").style.display = "none";
+                document.getElementById("app-header").innerHTML = `<span>🍽️ TAMARINDO - MESA ${num}</span>`;
+            }
+        });
+    }, 200);
 }
 
 function generarDias(){
@@ -276,6 +296,7 @@ function crearMesas(){
         b.className="btn"; b.textContent=i;
         b.onclick=(e)=>{
             e.stopPropagation();
+            if(mesaFijaPorQR) return; 
             document.querySelectorAll("#mesas .btn").forEach(x=>x.classList.remove("active"));
             b.classList.add("active");
         };
@@ -413,9 +434,12 @@ function imprimir(){
 function nuevoPedido() {
     if(!confirm("¿Borrar todo?")) return;
     total = 1; document.getElementById("count").textContent = total;
-    isDomicilio = false; document.getElementById("btn-domicilio").classList.remove("active");
+    if(!mesaFijaPorQR) {
+        isDomicilio = false; 
+        document.getElementById("btn-domicilio").classList.remove("active");
+        document.querySelectorAll("#mesas .btn").forEach(x => x.classList.remove("active"));
+    }
     document.querySelectorAll("input").forEach(i => i.value = "");
-    document.querySelectorAll("#mesas .btn").forEach(x => x.classList.remove("active"));
     render();
 }
 
