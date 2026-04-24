@@ -1,55 +1,95 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedidos PRO Tamarindo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tamarindo PRO</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
 
-<style>
-:root{
- --bg:#0f172a;
- --card:#1e293b;
- --accent:#22c55e;
- --accent2:#06b6d4;
- --text:#f8fafc;
- --soft:#334155;
-}
-body{margin:0;font-family:system-ui;background:linear-gradient(180deg,#0f172a,#020617);color:var(--text);min-height:100vh;}
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #22c55e;
+            --accent2: #06b6d4;
+            --text: #f8fafc;
+            --soft: #334155;
+        }
 
-header{background:linear-gradient(135deg,var(--accent),var(--accent2));padding:14px;text-align:center;font-weight:bold;font-size:1.2rem; display: flex; justify-content: center; align-items: center;}
-.container{padding:12px;max-width:500px;margin:auto;}
-.card{background:var(--card);padding:14px;border-radius:16px;margin-bottom:12px;box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.btn{padding:12px;border:none;border-radius:12px;background:var(--soft);color:white;cursor:pointer;font-weight:bold;transition:0.2s;}
-.btn.active{background:var(--accent);color:#022c22;}
-.btn-domi{background: #7c3aed; width: 100%; margin-bottom: 10px;}
-.btn-domi.active{background: #a78bfa; border: 2px solid white;}
+        /* Bloqueo de scroll lateral y selección de texto para parecer App */
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(180deg, #0f172a, #020617);
+            color: var(--text);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-.actions{display:flex;justify-content:center;align-items:center;gap:20px;}
-#count{font-size:1.5rem;font-weight:bold;}
-select, .input-domi, .input-obs{width:100%;padding:12px;border-radius:12px;border:none;background:#020617;color:white;margin-bottom:8px;font-size:14px; box-sizing: border-box; appearance: none;}
-.input-obs{border: 1px solid var(--soft); font-style: italic;}
+        header {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            padding: 18px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
 
-.cat-label {font-size: 10px; color: var(--accent2); margin-bottom: 2px; margin-left: 5px; font-weight: bold; text-transform: uppercase;}
+        .container { padding: 12px; max-width: 500px; margin: auto; }
+        .card { background: var(--card); padding: 14px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        
+        .btn { padding: 12px; border: none; border-radius: 12px; background: var(--soft); color: white; cursor: pointer; font-weight: bold; transition: 0.2s; -webkit-appearance: none; }
+        .btn.active { background: var(--accent); color: #022c22; transform: scale(0.95); }
+        
+        .btn-domi { background: #7c3aed; width: 100%; margin-bottom: 10px; border: 2px solid transparent; }
+        .btn-domi.active { background: #a78bfa; border: 2px solid white; }
 
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px; padding: 5px 0;}
-.chip{padding:8px 12px;border-radius:20px;background:#334155;cursor:pointer;font-size:12px;}
-.chip.active{background:var(--accent);color:#022c22;}
-.main-actions{display:flex;gap:10px;margin-top:10px;}
-.ticket-btn{background:var(--accent2);flex:1;}
-.wa-btn{background:var(--accent);flex:1;}
-.hist-item{background:#020617;padding:10px;border-radius:10px;margin-bottom:6px;font-size:13px;}
-.del-btn{background:#ef4444;border:none;color:white;padding:4px 8px;border-radius:6px;margin-top:5px;cursor:pointer;}
-label{display:block;margin-bottom:4px;font-size:11px;color:var(--accent2);text-transform:uppercase;font-weight:bold;}
-#printFrame { display: none; }
-</style>
+        .actions { display: flex; justify-content: center; align-items: center; gap: 20px; }
+        #count { font-size: 2rem; font-weight: bold; min-width: 40px; text-align: center; }
+
+        select, .input-domi, .input-obs { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; 
+            background: #020617; color: white; margin-bottom: 8px; 
+            font-size: 16px; box-sizing: border-box; appearance: none;
+        }
+        
+        .input-obs { border: 1px solid var(--soft); font-style: italic; }
+        .cat-label { font-size: 10px; color: var(--accent2); margin-bottom: 2px; margin-left: 5px; font-weight: bold; text-transform: uppercase; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; padding: 5px 0; }
+        .chip { padding: 10px 14px; border-radius: 20px; background: #334155; cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .chip.active { background: var(--accent); color: #022c22; font-weight: bold; }
+
+        .main-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .ticket-btn { background: var(--accent2); flex: 1; }
+        .wa-btn { background: var(--accent); flex: 1; }
+
+        .hist-item { background: #020617; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; border-left: 4px solid var(--accent2); }
+        .del-btn { background: #ef4444; border: none; color: white; padding: 6px 12px; border-radius: 8px; margin-top: 8px; cursor: pointer; }
+        
+        label { display: block; margin-bottom: 4px; font-size: 11px; color: var(--accent2); text-transform: uppercase; font-weight: bold; }
+        #printFrame { display: none; }
+
+        /* Animación suave al aparecer elementos */
+        .comensal-card { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-
-<body>
+<body onclick="activarFS()">
 
 <div id="app-content">
     <header>
-        <span>🍽️ TAMARINDO</span>
+        <span>🍽️ TAMARINDO PRO</span>
     </header>
 
     <div class="container">
@@ -81,23 +121,24 @@ label{display:block;margin-bottom:4px;font-size:11px;color:var(--accent2);text-t
         </div>
 
         <div class="card">
+            <label style="text-align: center;">Cantidad de Platos</label>
             <div class="actions">
-                <button class="btn" onclick="cambiar(-1)">➖</button>
+                <button class="btn" onclick="cambiar(-1)" style="font-size: 1.5rem;">➖</button>
                 <span id="count">1</span>
-                <button class="btn" onclick="cambiar(1)">➕</button>
+                <button class="btn" onclick="cambiar(1)" style="font-size: 1.5rem;">➕</button>
             </div>
         </div>
 
         <div id="comensales"></div>
 
         <div class="main-actions">
-            <button class="btn ticket-btn" onclick="imprimir()">🧾 Ticket</button>
-            <button class="btn wa-btn" onclick="wa()">📲 WhatsApp</button>
+            <button class="btn ticket-btn" onclick="imprimir()">🧾 Imprimir Ticket</button>
+            <button class="btn wa-btn" onclick="wa()">📲 Enviar WhatsApp</button>
         </div>
-        <button class="btn" style="width:100%; margin-top:10px; background:#f59e0b;" onclick="nuevoPedido()">🔄 Nuevo Pedido</button>
+        <button class="btn" style="width:100%; margin-top:10px; background:#f59e0b; padding: 15px;" onclick="nuevoPedido()">🔄 Limpiar Todo</button>
 
-        <div class="card" style="margin-top:20px;">
-            <h4>Historial Reciente</h4>
+        <div class="card" style="margin-top:20px; background: rgba(30, 41, 59, 0.5);">
+            <h4 style="margin:0 0 10px 0; color: var(--accent2);">Historial de hoy</h4>
             <div id="historial"></div>
         </div>
     </div>
@@ -112,6 +153,15 @@ const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vS29H3hxA9X8VcqQqGZlT
 
 let data=[], headers=[], colEspecial=-1, total=1;
 let isDomicilio = false;
+
+// Pantalla completa automática al primer clic
+function activarFS() {
+    let doc = document.documentElement;
+    if (!document.fullscreenElement) {
+        if (doc.requestFullscreen) doc.requestFullscreen();
+        else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
+    }
+}
 
 window.onload = loadData;
 
@@ -190,7 +240,8 @@ function crearMesas(){
     for(let i=1; i<=CANTIDAD_MESAS; i++){
         let b=document.createElement("button");
         b.className="btn"; b.textContent=i;
-        b.onclick=()=>{
+        b.onclick=(e)=>{
+            e.stopPropagation();
             document.querySelectorAll("#mesas .btn").forEach(x=>x.classList.remove("active"));
             b.classList.add("active");
         };
@@ -223,43 +274,18 @@ function render() {
         cont.innerHTML += `
         <div class="card comensal-card">
             <div style="display:flex; align-items:center; gap:5px; margin-bottom:10px;">
-                <span>👤</span> <b>Comensal ${i}</b>
+                <span>👤</span> <b>Plato ${i}</b>
             </div>
-            
-            <div class="group-e">
-                <div class="cat-label">Sopa</div>
-                <select class="e"></select>
-            </div>
-
-            <div class="group-p">
-                <div class="cat-label">Plato Principal</div>
-                <select class="p"></select>
-            </div>
-
-            <div class="group-pr">
-                <div class="cat-label">Proteína</div>
-                <select class="pr"></select>
-            </div>
-
-            <div class="group-a">
-                <div class="cat-label">Acompañamientos</div>
-                <div class="chips a"></div>
-            </div>
-
-            <div class="group-b">
-                <div class="cat-label">Bebida</div>
-                <select class="b"></select>
-            </div>
-
-            <div class="group-obs">
-                <div class="cat-label">Observaciones</div>
-                <input type="text" class="input-obs obs" placeholder="Ej: Sin cebolla, poca sal...">
-            </div>
+            <div class="group-e"><div class="cat-label">Sopa</div><select class="e"></select></div>
+            <div class="group-p"><div class="cat-label">Plato Principal</div><select class="p"></select></div>
+            <div class="group-pr"><div class="cat-label">Proteína</div><select class="pr"></select></div>
+            <div class="group-a"><div class="cat-label">Acompañamientos</div><div class="chips a"></div></div>
+            <div class="group-b"><div class="cat-label">Bebida</div><select class="b"></select></div>
+            <div class="group-obs"><div class="cat-label">Observaciones</div><input type="text" class="input-obs obs" placeholder="Sin cebolla, etc..."></div>
         </div>`;
     }
-    
     llenarSelects();
-
+    // Restaurar valores previos
     document.querySelectorAll(".comensal-card").forEach((card, i) => {
         if (actuales[i]) {
             if (card.querySelector(".e")) card.querySelector(".e").value = actuales[i].e;
@@ -279,12 +305,9 @@ function llenarSelects(){
     document.querySelectorAll(".comensal-card").forEach(card => {
         const sSopa = card.querySelector(".e"), sPlato = card.querySelector(".p"),
               sProt = card.querySelector(".pr"), sBebi = card.querySelector(".b"), dChip = card.querySelector(".a");
-        
-        const gSopa = card.querySelector(".group-e"), gProt = card.querySelector(".group-pr"), 
-              gChip = card.querySelector(".group-a");
+        const gSopa = card.querySelector(".group-e"), gProt = card.querySelector(".group-pr"), gChip = card.querySelector(".group-a");
 
         sBebi.innerHTML = get(5).map(x => `<option>${x}</option>`).join("");
-        
         if (modo === "especial") {
             sPlato.innerHTML = get(colEspecial).map(x => `<option>${x}</option>`).join("");
             gSopa.style.display = gProt.style.display = gChip.style.display = "none";
@@ -296,7 +319,7 @@ function llenarSelects(){
             dChip.innerHTML = "";
             get(3).forEach(i => {
                 let d = document.createElement("div"); d.className = "chip"; d.textContent = i;
-                d.onclick = () => d.classList.toggle("active"); dChip.appendChild(d);
+                d.onclick = (e) => { e.stopPropagation(); d.classList.toggle("active"); }; dChip.appendChild(d);
             });
         }
     });
@@ -328,13 +351,12 @@ function wa(){
             pr: c.querySelector(".group-pr").style.display !== "none" ? c.querySelector(".pr").value : "", 
             ch: [...c.querySelectorAll(".chip.active")].map(x => x.textContent).join(", ") 
         };
-        msg += `👤 *Comensal ${i + 1}*\n🍛 *Plato:* ${d.p}\n`;
+        msg += `👤 *Plato ${i + 1}*\n🍛 *Plato:* ${d.p}\n`;
         if(d.pr) msg += `🥩 *Prot:* ${d.pr}\n`;
         if(d.e) msg += `🍲 *Sopa:* ${d.e}\n`;
         if(d.ch) msg += `🍟 *Acomp:* ${d.ch}\n`;
         msg += `🥤 *Bebida:* ${d.b}\n`;
-        if(d.obs) msg += `📝 *Nota:* ${d.obs}\n`;
-        msg += `\n`;
+        if(d.obs) msg += `📝 *Nota:* ${d.obs}\n\n`;
     });
     window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(msg)}`);
 }
@@ -342,36 +364,14 @@ function wa(){
 function imprimir(){
     const mesaSel = mesa();
     const fecha = new Date().toLocaleString();
-    
-    // Datos Domicilio si aplica
     let domiHtml = "";
     if(isDomicilio) {
-        domiHtml = `
-        <div class="section-domi">
-            <b>>> DATOS DE ENVÍO <<</b><br>
-            CLIENTE: ${document.getElementById("dom-nombre").value.toUpperCase()}<br>
-            TEL: ${document.getElementById("dom-tel").value}<br>
-            DIR: ${document.getElementById("dom-dir").value.toUpperCase()}<br>
-            OBS: ${document.getElementById("dom-obs-general").value.toUpperCase() || "NINGUNA"}
-        </div>
-        <div class="line"></div>`;
+        domiHtml = `<div class="section-domi"><b>>> ENVÍO <<</b><br>CLIENTE: ${document.getElementById("dom-nombre").value.toUpperCase()}<br>TEL: ${document.getElementById("dom-tel").value}<br>DIR: ${document.getElementById("dom-dir").value.toUpperCase()}</div><div class="line"></div>`;
     }
-
     let itemsCaja = "", itemsCocina = "";
     document.querySelectorAll(".comensal-card").forEach((c, i) => {
-        let d = { 
-            p: c.querySelector(".p").value, 
-            b: c.querySelector(".b").value, 
-            obs: c.querySelector(".obs").value,
-            e: c.querySelector(".e")?.value, 
-            pr: c.querySelector(".pr")?.value, 
-            ch: [...c.querySelectorAll(".chip.active")].map(x => x.textContent).join(", ") 
-        };
-        
-        // Bloque Caja
+        let d = { p: c.querySelector(".p").value, b: c.querySelector(".b").value, obs: c.querySelector(".obs").value, e: c.querySelector(".e")?.value, pr: c.querySelector(".pr")?.value, ch: [...c.querySelectorAll(".chip.active")].map(x => x.textContent).join(", ") };
         itemsCaja += `[${i+1}] ${d.p.substring(0,25)}<br> &nbsp;&nbsp;+ ${d.b.substring(0,25)}<br>`;
-        
-        // Bloque Cocina
         itemsCocina += `<b>${i+1}. ${d.p.toUpperCase()}</b><br>`;
         if(d.e && c.querySelector(".group-e").style.display !== "none") itemsCocina += `- SOPA: ${d.e.toUpperCase()}<br>- PROT: ${d.pr.toUpperCase()}<br>`;
         if(d.ch && c.querySelector(".group-a").style.display !== "none") itemsCocina += `- EXT: ${d.ch.toUpperCase()}<br>`;
@@ -380,69 +380,24 @@ function imprimir(){
         itemsCocina += `<div class="line-thin"></div>`;
     });
 
-    const ticketStyles = `
-        <style>
-            body { font-family: 'Courier New', Courier, monospace; width: 48mm; font-size: 11px; color: black; margin: 0; padding: 2mm; line-height: 1.2; }
-            .center { text-align: center; }
-            .line { border-top: 1px dashed black; margin: 5px 0; }
-            .line-thin { border-top: 0.5px solid #ccc; margin: 4px 0; }
-            .header-title { font-size: 16px; font-weight: bold; display: block; }
-            .section-title { font-weight: bold; background: #eee; text-align: center; margin: 10px 0 5px 0; padding: 2px; }
-            .obs-ticket { font-weight: bold; border: 1px solid black; padding: 2px; margin: 2px 0; }
-            .section-domi { font-size: 10px; border-left: 3px solid black; padding-left: 4px; }
-            pre { white-space: pre-wrap; font-family: inherit; }
-        </style>`;
-
-    const doc = `
-    <html>
-    <head>${ticketStyles}</head>
-    <body>
-        <div class="center">
-            <span class="header-title">TAMARINDO</span>
-            Cocinando con Amor<br>
-            ${fecha}
-        </div>
-        <div class="line"></div>
-        <div class="center" style="font-size:14px"><b>${isDomicilio ? "🛵 DOMICILIO" : "🪑 MESA: " + mesaSel}</b></div>
-        <div class="line"></div>
-        
-        ${domiHtml}
-
-        <div class="section-title">COPIA CAJA</div>
-        ${itemsCaja}
-        
-        <div style="page-break-after: always; margin: 20px 0; border-top: 2px dotted black;"></div>
-
-        <div class="center"><b>>> COCINA <<</b></div>
-        <div class="center">${isDomicilio ? "DOMICILIO" : "MESA: " + mesaSel}</div>
-        <div class="line"></div>
-        ${itemsCocina}
-        
-        <div class="center" style="margin-top:10px">--- FIN DE PEDIDO ---</div>
-    </body>
-    </html>`;
+    const doc = `<html><head><style>body{font-family:'Courier New';width:48mm;font-size:11px;padding:2mm;}.center{text-align:center;}.line{border-top:1px dashed black;margin:5px 0;}.line-thin{border-top:0.5px solid #ccc;margin:4px 0;}.header-title{font-size:16px;font-weight:bold;}.section-title{font-weight:bold;background:#eee;text-align:center;margin:10px 0;}.obs-ticket{font-weight:bold;border:1px solid black;padding:2px;}</style></head>
+    <body><div class="center"><span class="header-title">TAMARINDO</span><br>${fecha}</div><div class="line"></div><div class="center" style="font-size:14px"><b>${isDomicilio ? "🛵 DOMICILIO" : "🪑 MESA: " + mesaSel}</b></div><div class="line"></div>${domiHtml}<div class="section-title">CAJA</div>${itemsCaja}<div style="page-break-after:always;"></div><div class="center"><b>>> COCINA <<</b><br>MESA: ${mesaSel}</div><div class="line"></div>${itemsCocina}</body></html>`;
 
     const frame = document.getElementById('printFrame');
     const frameDoc = frame.contentWindow.document;
-    frameDoc.open(); 
-    frameDoc.write(doc); 
-    frameDoc.close();
-    
-    setTimeout(() => { 
-        frame.contentWindow.print(); 
-        guardarPedido(); 
-    }, 500);
+    frameDoc.open(); frameDoc.write(doc); frameDoc.close();
+    setTimeout(() => { frame.contentWindow.print(); guardarPedido(); }, 500);
 }
 
 function nuevoPedido() {
-    if(!confirm("¿Deseas limpiar TODA la información del pedido?")) return;
+    if(!confirm("¿Limpiar pedido actual?")) return;
     total = 1; 
     document.getElementById("count").textContent = total;
     isDomicilio = false; 
     document.getElementById("btn-domicilio").classList.remove("active");
     document.getElementById("section-domicilio").style.display = "none";
     document.getElementById("section-mesas").style.display = "block";
-    document.querySelectorAll("input").forEach(i => { if(i.type === "text" || i.type === "number") i.value = ""; });
+    document.querySelectorAll("input").forEach(i => i.value = "");
     document.querySelectorAll("#mesas .btn").forEach(x => x.classList.remove("active"));
     render();
 }
@@ -458,7 +413,7 @@ function cargarHistorial(){
     let p = JSON.parse(localStorage.getItem("pedidos") || "[]");
     document.getElementById("historial").innerHTML = p.map((x,i)=>`
         <div class="hist-item"><b>${x.mesa}</b> (${x.fecha})<br><small>${x.platos.join(", ")}</small><br>
-        <button class="del-btn" onclick="del(${i})">Borrar</button></div>`).join("");
+        <button class="del-btn" onclick="event.stopPropagation(); del(${i})">Borrar</button></div>`).join("");
 }
 
 function del(i){
