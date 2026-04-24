@@ -1,110 +1,442 @@
-<style>
-:root {
-    --bg: #0f172a;
-    --card: #1e293b;
-    --accent: #22c55e;
-    --accent2: #06b6d4;
-    --text: #f8fafc;
-    --soft: #334155;
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tamarindo PRO</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
 
-/* Base de App a pantalla completa */
-body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh;
-    font-family: system-ui, -apple-system, sans-serif;
-    background: #020617;
-    color: var(--text);
-    overflow-x: hidden;
-}
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #22c55e;
+            --accent2: #06b6d4;
+            --text: #f8fafc;
+            --soft: #334155;
+        }
 
-#app-content {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #0f172a, #020617);
-}
+        /* Estructura Base: Ocupa toda la pantalla */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #020617;
+            color: var(--text);
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-header {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    padding: 15px;
-    text-align: center;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    flex-shrink: 0;
-}
+        #app-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0f172a, #020617);
+        }
 
-/* Contenedor flexible que se adapta a la orientación */
-.container {
-    padding: 15px;
-    display: flex;
-    flex-wrap: wrap; /* Esto permite que se acomoden de lado en horizontal */
-    gap: 15px;
-    justify-content: center;
-    width: 100%;
-    box-sizing: border-box;
-}
+        header {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            padding: 18px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
 
-/* Tarjetas flexibles */
-.card {
-    background: var(--card);
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
-    box-sizing: border-box;
-    /* En vertical ocupan todo el ancho */
-    flex: 1 1 100%; 
-}
+        /* Contenedor Adaptativo */
+        .container {
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-/* En pantallas horizontales o anchas (Tablets/PC), las tarjetas se dividen el espacio */
-@media (min-width: 768px) {
-    .card {
-        flex: 1 1 calc(45% - 15px); /* Se acomodan de a dos */
+        /* Tarjetas que se ajustan según el ancho */
+        .card {
+            background: var(--card);
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            flex: 1 1 100%; /* Por defecto ancho total */
+        }
+
+        /* En pantallas anchas (Horizontal/Tablet/PC) se ponen de a dos */
+        @media (min-width: 768px) {
+            .card.config-card { flex: 1 1 30%; }
+            .card.entrega-card { flex: 1 1 60%; }
+            .card.count-card { flex: 1 1 100%; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 8px;
+        }
+
+        .btn { padding: 12px; border: none; border-radius: 12px; background: var(--soft); color: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn.active { background: var(--accent); color: #022c22; transform: scale(0.96); }
+        .btn-domi { background: #7c3aed; width: 100%; margin-bottom: 10px; border: 2px solid transparent; }
+        .btn-domi.active { background: #a78bfa; border: 2px solid white; }
+
+        .actions { display: flex; justify-content: center; align-items: center; gap: 30px; }
+        #count { font-size: 2.5rem; font-weight: bold; }
+
+        select, .input-domi, .input-obs { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; 
+            background: #020617; color: white; margin-bottom: 8px; 
+            font-size: 16px; box-sizing: border-box; appearance: none;
+            border: 1px solid var(--soft);
+        }
+
+        .cat-label { font-size: 10px; color: var(--accent2); margin-bottom: 2px; font-weight: bold; text-transform: uppercase; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .chip { padding: 10px 14px; border-radius: 20px; background: #334155; cursor: pointer; font-size: 13px; }
+        .chip.active { background: var(--accent); color: #022c22; font-weight: bold; }
+
+        #comensales { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; }
+        .comensal-card { flex: 1 1 calc(50% - 15px); min-width: 300px; }
+
+        @media (max-width: 600px) { .comensal-card { flex: 1 1 100%; } }
+
+        .main-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
+        .ticket-btn { background: var(--accent2); flex: 1; padding: 18px; }
+        .wa-btn { background: var(--accent); flex: 1; padding: 18px; }
+
+        .hist-item { background: #020617; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid var(--accent2); }
+        .del-btn { background: #ef4444; border: none; color: white; padding: 6px 12px; border-radius: 8px; margin-top: 8px; cursor: pointer; }
+        
+        #printFrame { display: none; }
+    </style>
+</head>
+<body onclick="activarFS()">
+
+<div id="app-content">
+    <header><span>🍽️ TAMARINDO PRO</span></header>
+
+    <div class="container">
+        <div class="card config-card">
+            <label class="cat-label">Día y Categoría</label>
+            <div style="display:flex; gap:10px;">
+                <select id="dia"></select>
+                <select id="tipoMenu">
+                    <option value="corriente">🍽 Corriente</option>
+                    <option value="especial">⭐ Especial</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card entrega-card">
+            <button id="btn-domicilio" class="btn btn-domi" onclick="toggleDomicilio()">🛵 ES DOMICILIO</button>
+            <div id="section-domicilio" style="display:none; border-top: 1px solid var(--soft); padding-top:10px;">
+                <input type="text" id="dom-nombre" class="input-domi" placeholder="Nombre Cliente">
+                <input type="text" id="dom-tel" class="input-domi" placeholder="Teléfono">
+                <input type="text" id="dom-dir" class="input-domi" placeholder="Dirección">
+                <input type="text" id="dom-obs-general" class="input-domi" placeholder="Obs. Entrega">
+            </div>
+            <div id="section-mesas">
+                <label class="cat-label">Mesa</label>
+                <div class="grid" id="mesas"></div>
+            </div>
+        </div>
+
+        <div class="card count-card">
+            <div class="actions">
+                <button class="btn" onclick="cambiar(-1)" style="font-size:2rem">➖</button>
+                <span id="count">1</span>
+                <button class="btn" onclick="cambiar(1)" style="font-size:2rem">➕</button>
+            </div>
+        </div>
+
+        <div id="comensales"></div>
+
+        <div class="main-actions">
+            <button class="btn ticket-btn" onclick="imprimir()">🧾 TICKET</button>
+            <button class="btn wa-btn" onclick="wa()">📲 WHATSAPP</button>
+        </div>
+        
+        <button class="btn" style="width:100%; margin-top:10px; background:#f59e0b; padding:15px;" onclick="nuevoPedido()">🔄 NUEVO PEDIDO</button>
+
+        <div class="card" style="margin-top:20px; background: rgba(0,0,0,0.3);">
+            <h4 style="margin:0 0 10px 0; color: var(--accent2);">Historial Reciente</h4>
+            <div id="historial"></div>
+        </div>
+    </div>
+</div>
+
+<iframe id="printFrame"></iframe>
+
+<script>
+const NUMERO_WHATSAPP = "573143996019"; 
+const CANTIDAD_MESAS = 12; 
+const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vS29H3hxA9X8VcqQqGZlT4duXOIT3xAdIhExEIut9frN0i78naYSj6gnWFkWliWwKNLT5tGNlaYh16j/pub?output=csv";
+
+let data=[], headers=[], colEspecial=-1, total=1;
+let isDomicilio = false;
+
+function activarFS() {
+    let doc = document.documentElement;
+    if (!document.fullscreenElement) {
+        if (doc.requestFullscreen) doc.requestFullscreen();
+        else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
     }
-    .main-actions {
-        flex: 1 1 100%; /* Botones de acción siempre abajo a lo ancho */
+}
+
+window.onload = loadData;
+
+function toggleDomicilio(){
+    isDomicilio = !isDomicilio;
+    document.getElementById("btn-domicilio").classList.toggle("active", isDomicilio);
+    document.getElementById("section-domicilio").style.display = isDomicilio ? "block" : "none";
+    document.getElementById("section-mesas").style.display = isDomicilio ? "none" : "block";
+}
+
+function loadData(){
+    fetch(URL).then(r=>r.text()).then(t=>{
+        let raw = parse(t);
+        headers = raw[0].map(h=>h.toLowerCase().trim());
+        colEspecial = headers.indexOf("especiales");
+        data = raw.slice(1).map(r=>r.map(limpiar));
+        init();
+    });
+}
+
+function limpiar(txt){
+    if(!txt) return "";
+    let t=document.createElement("textarea");
+    t.innerHTML=txt;
+    return t.value.replace(/&[a-zA-Z0-9#]+;/g, "").trim();
+}
+
+function parse(t){
+    let r=[],row=[],c='',q=false;
+    for(let ch of t){
+        if(ch=='"') q=!q;
+        else if(ch==','&&!q){row.push(c);c=''}
+        else if(ch=='\n'&&!q){row.push(c);r.push(row);row=[];c=''}
+        else c+=ch;
+    }
+    row.push(c);r.push(row);
+    return r;
+}
+
+function init(){
+    generarDias();
+    autoDia();
+    crearMesas();
+    render();
+    cargarHistorial();
+}
+
+function generarDias(){
+    let d=[...new Set(data.map(r=>r[0].toUpperCase()))];
+    document.getElementById("dia").innerHTML=d.map(x=>`<option value="${x}">${x}</option>`).join("");
+}
+
+function autoDia(){
+    let h=["DOMINGO","LUNES","MARTES","MIERCOLES","JUEVES","VIERNES","SABADO"][new Date().getDay()];
+    let selectDia = document.getElementById("dia");
+    if([...selectDia.options].some(o => o.value === h)) selectDia.value = h;
+}
+
+function get(colIndex){
+    const modo = document.getElementById("tipoMenu").value;
+    const diaActual = document.getElementById("dia").value;
+    return [...new Set(
+        data.filter(r => r[0].toUpperCase() === diaActual)
+        .flatMap(r => {
+            if (modo === "especial" && colIndex !== 5) {
+                return (colIndex === colEspecial) ? (r[colEspecial] || "").split("-").map(limpiar).filter(Boolean) : [];
+            }
+            return (r[colIndex] || "").split("-").map(limpiar).filter(Boolean);
+        })
+    )];
+}
+
+function crearMesas(){
+    const contenedor = document.getElementById("mesas");
+    contenedor.innerHTML = "";
+    for(let i=1; i<=CANTIDAD_MESAS; i++){
+        let b=document.createElement("button");
+        b.className="btn"; b.textContent=i;
+        b.onclick=(e)=>{
+            e.stopPropagation();
+            document.querySelectorAll("#mesas .btn").forEach(x=>x.classList.remove("active"));
+            b.classList.add("active");
+        };
+        contenedor.appendChild(b);
     }
 }
 
-/* Rejilla de mesas adaptable */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    gap: 10px;
+function cambiar(n){
+    total = Math.max(1, total + n);
+    document.getElementById("count").textContent = total;
+    render();
 }
 
-/* Ajustes de inputs para que no se deformen */
-select, .input-domi, .input-obs {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    background: #020617;
-    color: white;
-    border: 1px solid var(--soft);
-    font-size: 16px;
+function render() {
+    const cont = document.getElementById("comensales");
+    const actuales = [];
+    document.querySelectorAll(".comensal-card").forEach(card => {
+        actuales.push({
+            e: card.querySelector(".e")?.value,
+            p: card.querySelector(".p")?.value,
+            pr: card.querySelector(".pr")?.value,
+            b: card.querySelector(".b")?.value,
+            obs: card.querySelector(".obs")?.value,
+            chips: [...card.querySelectorAll(".chip.active")].map(c => c.textContent)
+        });
+    });
+
+    cont.innerHTML = "";
+    for (let i = 1; i <= total; i++) {
+        cont.innerHTML += `
+        <div class="card comensal-card">
+            <div style="margin-bottom:10px;">👤 <b>Plato ${i}</b></div>
+            <div class="group-e"><div class="cat-label">Sopa</div><select class="e"></select></div>
+            <div class="group-p"><div class="cat-label">Plato Principal</div><select class="p"></select></div>
+            <div class="group-pr"><div class="cat-label">Proteína</div><select class="pr"></select></div>
+            <div class="group-a"><div class="cat-label">Acompañamientos</div><div class="chips a"></div></div>
+            <div class="group-b"><div class="cat-label">Bebida</div><select class="b"></select></div>
+            <div class="group-obs"><div class="cat-label">Notas</div><input type="text" class="input-obs obs" placeholder="..."></div>
+        </div>`;
+    }
+    llenarSelects();
+    document.querySelectorAll(".comensal-card").forEach((card, i) => {
+        if (actuales[i]) {
+            if (card.querySelector(".e")) card.querySelector(".e").value = actuales[i].e;
+            if (card.querySelector(".p")) card.querySelector(".p").value = actuales[i].p;
+            if (card.querySelector(".pr")) card.querySelector(".pr").value = actuales[i].pr;
+            if (card.querySelector(".b")) card.querySelector(".b").value = actuales[i].b;
+            if (card.querySelector(".obs")) card.querySelector(".obs").value = actuales[i].obs || "";
+            card.querySelectorAll(".chip").forEach(chip => {
+                if (actuales[i].chips.includes(chip.textContent)) chip.classList.add("active");
+            });
+        }
+    });
 }
 
-.actions { display: flex; justify-content: center; align-items: center; gap: 30px; }
-#count { font-size: 2.5rem; font-weight: bold; }
+function llenarSelects(){
+    const modo = document.getElementById("tipoMenu").value;
+    document.querySelectorAll(".comensal-card").forEach(card => {
+        const sSopa = card.querySelector(".e"), sPlato = card.querySelector(".p"),
+              sProt = card.querySelector(".pr"), sBebi = card.querySelector(".b"), dChip = card.querySelector(".a");
+        const gSopa = card.querySelector(".group-e"), gProt = card.querySelector(".group-pr"), gChip = card.querySelector(".group-a");
 
-.main-actions {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    margin-top: 10px;
+        sBebi.innerHTML = get(5).map(x => `<option>${x}</option>`).join("");
+        if (modo === "especial") {
+            sPlato.innerHTML = get(colEspecial).map(x => `<option>${x}</option>`).join("");
+            gSopa.style.display = gProt.style.display = gChip.style.display = "none";
+        } else {
+            gSopa.style.display = gProt.style.display = gChip.style.display = "block";
+            sSopa.innerHTML = get(4).map(x => `<option>${x}</option>`).join("");
+            sPlato.innerHTML = get(1).map(x => `<option>${x}</option>`).join("");
+            sProt.innerHTML = get(2).map(x => `<option>${x}</option>`).join("");
+            dChip.innerHTML = "";
+            get(3).forEach(i => {
+                let d = document.createElement("div"); d.className = "chip"; d.textContent = i;
+                d.onclick = (e) => { e.stopPropagation(); d.classList.toggle("active"); }; dChip.appendChild(d);
+            });
+        }
+    });
 }
 
-#comensales {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    width: 100%;
+document.getElementById("dia").onchange = render;
+document.getElementById("tipoMenu").onchange = render;
+
+function mesa(){
+    if(isDomicilio) return "DOMICILIO";
+    let m=document.querySelector("#mesas .active");
+    return m ? m.textContent : "N/A";
 }
 
-/* Las tarjetas de platos individuales se adaptan al espacio lateral */
-.comensal-card {
-    flex: 1 1 minmax(300px, 1fr);
+function wa(){
+    const mesaSel = mesa();
+    let msg = `🍴 *TAMARINDO - PEDIDO*\n🪑 *Mesa:* ${mesaSel}\n`;
+    if(isDomicilio) msg += `👤 *Cliente:* ${document.getElementById("dom-nombre").value}\n📍 *Dir:* ${document.getElementById("dom-dir").value}\n`;
+    msg += `--------------------------\n\n`;
+    document.querySelectorAll(".comensal-card").forEach((c, i) => {
+        let d = { 
+            p: c.querySelector(".p").value, b: c.querySelector(".b").value, obs: c.querySelector(".obs").value,
+            e: c.querySelector(".group-e").style.display !== "none" ? c.querySelector(".e").value : "", 
+            pr: c.querySelector(".group-pr").style.display !== "none" ? c.querySelector(".pr").value : "", 
+            ch: [...c.querySelectorAll(".chip.active")].map(x => x.textContent).join(", ") 
+        };
+        msg += `👤 *Plato ${i+1}*\n🍛 *Plato:* ${d.p}\n`;
+        if(d.pr) msg += `🥩 *Prot:* ${d.pr}\n`;
+        if(d.e) msg += `🍲 *Sopa:* ${d.e}\n`;
+        if(d.ch) msg += `🍟 *Acomp:* ${d.ch}\n`;
+        msg += `🥤 *Bebida:* ${d.b}\n`;
+        if(d.obs) msg += `📝 *Nota:* ${d.obs}\n\n`;
+    });
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(msg)}`);
 }
-</style>
+
+function imprimir(){
+    const mesaSel = mesa();
+    const fecha = new Date().toLocaleString();
+    let itemsCaja = "", itemsCocina = "";
+    document.querySelectorAll(".comensal-card").forEach((c, i) => {
+        let d = { p: c.querySelector(".p").value, b: c.querySelector(".b").value, obs: c.querySelector(".obs").value, e: c.querySelector(".e")?.value, pr: c.querySelector(".pr")?.value, ch: [...c.querySelectorAll(".chip.active")].map(x => x.textContent).join(", ") };
+        itemsCaja += `[${i+1}] ${d.p}<br>+ ${d.b}<br>`;
+        itemsCocina += `<b>${i+1}. ${d.p.toUpperCase()}</b><br>`;
+        if(d.e && c.querySelector(".group-e").style.display !== "none") itemsCocina += `- Sopa: ${d.e}<br>- Prot: ${d.pr}<br>`;
+        if(d.ch && c.querySelector(".group-a").style.display !== "none") itemsCocina += `- Ext: ${d.ch}<br>`;
+        if(d.obs) itemsCocina += `<div style="border:1px solid black; padding:2px">NOTA: ${d.obs.toUpperCase()}</div>`;
+        itemsCocina += `<hr>`;
+    });
+
+    const doc = `<html><head><style>body{font-family:'Courier New';width:48mm;font-size:11px;} .center{text-align:center;}</style></head>
+    <body><div class="center"><b>TAMARINDO</b><br>${fecha}<br><b>${isDomicilio ? "DOMICILIO" : "MESA: " + mesaSel}</b></div><hr>${itemsCaja}<div style="page-break-after:always;"></div><div class="center"><b>>> COCINA <<</b><br>MESA: ${mesaSel}</div><hr>${itemsCocina}</body></html>`;
+
+    const frame = document.getElementById('printFrame');
+    const frameDoc = frame.contentWindow.document;
+    frameDoc.open(); frameDoc.write(doc); frameDoc.close();
+    setTimeout(() => { frame.contentWindow.print(); guardarPedido(); }, 500);
+}
+
+function nuevoPedido() {
+    if(!confirm("¿Borrar todo?")) return;
+    total = 1; document.getElementById("count").textContent = total;
+    isDomicilio = false; document.getElementById("btn-domicilio").classList.remove("active");
+    document.querySelectorAll("input").forEach(i => i.value = "");
+    document.querySelectorAll("#mesas .btn").forEach(x => x.classList.remove("active"));
+    render();
+}
+
+function guardarPedido(){
+    let p = JSON.parse(localStorage.getItem("pedidos") || "[]");
+    p.unshift({ mesa: mesa(), fecha: new Date().toLocaleTimeString(), platos: [...document.querySelectorAll(".p")].map(x=>x.value) });
+    localStorage.setItem("pedidos", JSON.stringify(p.slice(0,10)));
+    cargarHistorial();
+}
+
+function cargarHistorial(){
+    let p = JSON.parse(localStorage.getItem("pedidos") || "[]");
+    document.getElementById("historial").innerHTML = p.map((x,i)=>`
+        <div class="hist-item"><b>${x.mesa}</b> (${x.fecha})<br><small>${x.platos.join(", ")}</small><br>
+        <button class="del-btn" onclick="del(${i})">Borrar</button></div>`).join("");
+}
+
+function del(i){
+    let p = JSON.parse(localStorage.getItem("pedidos"));
+    p.splice(i,1); localStorage.setItem("pedidos", JSON.stringify(p)); cargarHistorial();
+}
+</script>
+</body>
+</html>
