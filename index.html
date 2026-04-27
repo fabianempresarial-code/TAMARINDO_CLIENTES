@@ -20,7 +20,7 @@
 
         .input-field { width:100%; padding:12px; border-radius:10px; border:1px solid var(--soft); background:#020617; color:white; margin-bottom:8px; box-sizing:border-box;}
 
-        .cat-container { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 15px; padding-bottom: 8px; scrollbar-width: none;}
+        .cat-container { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 15px; padding-bottom: 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch;}
         .btn-cat { flex: 0 0 auto; padding: 8px 15px; border: 1px solid var(--soft); border-radius: 15px; background: #020617; color: white; cursor: pointer; font-size: 13px; font-weight: bold;}
         .btn-cat.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
@@ -31,7 +31,7 @@
         }
         .chip img { width:100%; height:110px; object-fit:cover; background:#1e293b;}
         .chip-info { padding:10px; }
-        .chip-info b { display:block; font-size:13px; color:#ffffff; height: 32px; overflow: hidden;}
+        .chip-info b { display:block; font-size:13px; color:#ffffff; height: 32px; overflow: hidden; margin-bottom: 5px;}
         .chip-info span { color:var(--accent); font-weight:bold; font-size:15px;}
 
         .item-pedido {
@@ -99,24 +99,43 @@
 </div>
 
 <script>
-const WHATSAPP_NEGOCIO = "573142553018"; // Cambia al número real
+const WHATSAPP_NEGOCIO = "573142553018"; 
 const URL_MENU = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTU3FT66_0vVAygWPIDfjIAhGwnKGWeBhDB3cVrzkMZQRP6M0ONz2_xwy-u8Q7muAoP6oa4QFxXc7xb/pub?output=csv";
 
 let menu = [], pedido = [], tipoServicio = 'local', mesaSeleccionada = "";
+
+// Parseador de CSV profesional para evitar errores con comas internas
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/);
+    return lines.map(line => {
+        const result = [];
+        let cur = '', inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+            let char = line[i];
+            if (char === '"') inQuote = !inQuote;
+            else if (char === ',' && !inQuote) { result.push(cur); cur = ''; }
+            else cur += char;
+        }
+        result.push(cur);
+        return result;
+    });
+}
 
 async function cargarMenu() {
     try {
         const res = await fetch(URL_MENU);
         const text = await res.text();
-        const rows = text.split('\n').slice(1);
+        const data = parseCSV(text).slice(1);
         
-        menu = rows.map(row => {
-            const cols = row.split(',');
-            // Limpieza de URL de imagen para forzar carga
+        menu = data.map(cols => {
             let imgUrl = cols[4]?.trim() || '';
-            if(imgUrl.includes('drive.google.com')){
-                const id = imgUrl.split('id=')[1] || imgUrl.split('/d/')[1]?.split('/')[0];
-                imgUrl = `https://lh3.googleusercontent.com/u/0/d/${id}`;
+            // Conversión de enlaces de Drive para visualización directa
+            if(imgUrl.includes('id=')) {
+                const id = imgUrl.split('id=')[1].split('&')[0];
+                imgUrl = `https://lh3.googleusercontent.com/d/${id}`;
+            } else if(imgUrl.includes('/d/')) {
+                const id = imgUrl.split('/d/')[1].split('/')[0];
+                imgUrl = `https://lh3.googleusercontent.com/d/${id}`;
             }
 
             return { 
@@ -125,18 +144,18 @@ async function cargarMenu() {
                 precio: parseInt(cols[3]?.replace(/[^0-9]/g, '')) || 0, 
                 img: imgUrl 
             };
-        }).filter(m => m.nombre);
+        }).filter(m => m.nombre && m.precio > 0);
 
         renderCategorias();
         crearMesasSelector();
-    } catch (e) { console.error("Error menu:", e); }
+    } catch (e) { console.error("Error cargando menú:", e); }
 }
 
 function renderCategorias() {
     const cats = [...new Set(menu.map(m => m.cat))].filter(Boolean);
     const cont = document.getElementById("cat-list");
     cont.innerHTML = cats.map((c, i) => `<button class="btn-cat ${i===0?'active':''}" onclick="filtrarCat('${c}', this)">${c}</button>`).join("");
-    if(cats.length) filtrarCat(cats[0], cont.firstChild);
+    if(cats.length) filtrarCat(cats[0], cont.querySelector('.btn-cat'));
 }
 
 function filtrarCat(cat, btn) {
@@ -145,14 +164,18 @@ function filtrarCat(cat, btn) {
     const cont = document.getElementById("chips-menu");
     cont.innerHTML = menu.filter(m => m.cat === cat).map(p => `
         <div class="chip" onclick="agregarAlPedido('${p.nombre}')">
-            <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Comida'">
-            <div class="chip-info"><b>${p.nombre}</b><span>$${p.precio.toLocaleString()}</span></div>
+            <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150?text=Cargando...'">
+            <div class="chip-info">
+                <b>${p.nombre}</b>
+                <span>$${p.precio.toLocaleString('es-CO')}</span>
+            </div>
         </div>`).join("");
 }
 
 function crearMesasSelector() {
     const cont = document.getElementById("mesas");
-    for(let i=1; i<=10; i++) {
+    cont.innerHTML = "";
+    for(let i=1; i<=12; i++) {
         let b = document.createElement("button"); b.className="btn"; b.textContent=i;
         b.onclick = () => {
             document.querySelectorAll("#mesas .btn").forEach(x => x.classList.remove("active"));
@@ -194,7 +217,7 @@ function actualizarResumen() {
     cont.innerHTML = Object.values(agrupado).map(p => `
         <div class="item-pedido">
             <div style="flex:1;"><b>${p.nombre}</b><br><small>Cant: ${p.cant}</small></div>
-            <b style="margin-right:10px;">$${(p.precio * p.cant).toLocaleString()}</b>
+            <b style="margin-right:10px;">$${(p.precio * p.cant).toLocaleString('es-CO')}</b>
             <button class="del-btn" onclick="quitarDelPedido('${p.nombre}')">✕</button>
         </div>`).join("");
     actualizarTotales();
@@ -202,7 +225,7 @@ function actualizarResumen() {
 
 function actualizarTotales() {
     let t = pedido.reduce((s, p) => s + p.precio, 0);
-    document.getElementById("total-val").textContent = `$${t.toLocaleString()}`;
+    document.getElementById("total-val").textContent = `$${t.toLocaleString('es-CO')}`;
     document.getElementById("badge-items").textContent = `${pedido.length} productos`;
 }
 
